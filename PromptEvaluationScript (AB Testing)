@@ -1,0 +1,21 @@
+from openai import AzureOpenAI
+
+client = AzureOpenAI(
+    api_key="YOUR_KEY",
+    api_version="2024-02-01",
+    azure_endpoint="https://YOUR-RESOURCE.openai.azure.com"
+)
+
+prompts = {
+    "A": "Summarize the text in one sentence.",
+    "B": "Provide a concise, single-sentence summary."
+}
+
+text = "Azure OpenAI provides enterprise-grade access to advanced language models."
+
+for label, prompt in prompts.items():
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": f"{prompt}\n\n{text}"}]
+    )
+    print(f"Prompt {label}: {response.choices[0].message['content']}")
