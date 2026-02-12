@@ -1,0 +1,20 @@
+using Azure.AI.OpenAI;
+using Azure;
+
+var client = new OpenAIClient(
+    new Uri("https://YOUR-RESOURCE.openai.azure.com/"),
+    new AzureKeyCredential("YOUR_KEY")
+);
+
+var messages = new List<ChatMessage>
+{
+    new ChatMessage(ChatRole.System, "You are a helpful assistant."),
+    new ChatMessage(ChatRole.User, "Write a short product description for a smart thermostat.")
+};
+
+var response = client.GetChatCompletions(
+    "gpt-4o-mini",
+    new ChatCompletionsOptions { Messages = messages }
+);
+
+Console.WriteLine(response.Value.Choices[0].Message.Content);
