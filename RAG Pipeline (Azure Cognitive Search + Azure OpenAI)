@@ -1,0 +1,39 @@
+from openai import AzureOpenAI
+import requests
+
+SEARCH_ENDPOINT = "https://YOUR-SEARCH.search.windows.net"
+SEARCH_KEY = "YOUR_SEARCH_KEY"
+INDEX_NAME = "documents"
+
+def search(query):
+    url = f"{SEARCH_ENDPOINT}/indexes/{INDEX_NAME}/docs/search?api-version=2023-07-01-Preview"
+    headers = {"Content-Type": "application/json", "api-key": SEARCH_KEY}
+    payload = {"search": query, "top": 3}
+    return requests.post(url, headers=headers, json=payload).json()
+
+client = AzureOpenAI(
+    api_key="YOUR_KEY",
+    api_version="2024-02-01",
+    azure_endpoint="https://YOUR-RESOURCE.openai.azure.com"
+)
+
+query = "What are the refund rules?"
+docs = search(query)
+
+context = "\n\n".join([d["content"] for d in docs["value"]])
+
+prompt = f"""
+Use ONLY the context below to answer.
+
+Context:
+{context}
+
+Question: {query}
+"""
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": prompt}]
+)
+
+print(response.choices[0].message["content"])
